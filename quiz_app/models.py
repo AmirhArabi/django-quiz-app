@@ -1,4 +1,16 @@
 from django.db import models
+from django.contrib.auth.models import User
+
+
+class Category(models.Model):
+    category_name = models.CharField(max_length=150, unique=True, verbose_name='دسته بندی', null=False, blank=False)
+
+    def __str__(self):
+        return self.category_name
+
+    class Meta:
+        verbose_name = 'دسته بندی'
+        verbose_name_plural = 'دسته بندی ها'
 
 
 class Question(models.Model):
@@ -8,6 +20,7 @@ class Question(models.Model):
         ('option3', 'option3'),
         ('option4', 'option4'),
     ]
+    category = models.ForeignKey(Category, on_delete=models.DO_NOTHING)
     question = models.CharField(max_length=50, unique=True, verbose_name='سوال')
     option1 = models.CharField(max_length=50, verbose_name='گزینه اول')
     option2 = models.CharField(max_length=50, verbose_name='گزینه دوم')
@@ -15,6 +28,8 @@ class Question(models.Model):
     option4 = models.CharField(max_length=50, verbose_name='گزینه چهارم')
     answer = models.CharField(max_length=7, choices=CHOISES, verbose_name='پاسخ', help_text='گزینه درست را انتخاب کنید')
     status = models.BooleanField(default=False, help_text='وضعیت انتشار سوال', verbose_name='وضعیت')
+    image = models.ImageField(upload_to='images/', verbose_name='تصویر', blank=True, null=True,
+                              help_text='تصویر مربوط به سوال', default='images/default.png')
 
     def __str__(self):
         return self.question
@@ -25,16 +40,16 @@ class Question(models.Model):
 
 
 class UserResult(models.Model):
-    fullname = models.CharField(max_length=20, verbose_name='نام و نام خانوادگی')
-    totall = models.PositiveSmallIntegerField(default=0, verbose_name='کل سوالات')
+    username = models.ForeignKey(User, on_delete=models.DO_NOTHING)
+    total = models.PositiveSmallIntegerField(default=0, verbose_name='کل سوالات')
     score = models.PositiveSmallIntegerField(default=0, verbose_name='امتیاز')
     percent = models.FloatField(max_length=5, verbose_name='درصد')
-    correct = models.PositiveSmallIntegerField(default=0, verbose_name='تعداد سوالات درست')
+    current = models.PositiveSmallIntegerField(default=0, verbose_name='تعداد سوالات درست')
     wrong = models.PositiveSmallIntegerField(default=0, verbose_name='تعداد سوالات غلط')
-    created_at = models.DateTimeField(auto_now_add=True, verbose_name='تاریخ ایجاد ')
+    last_update = models.DateTimeField(auto_now_add=True, verbose_name='آخرین تغییر ', blank=True, null=True)
 
     def __str__(self):
-        return self.fullname
+        return self.username.username
 
     class Meta:
         verbose_name = 'نتیجه'

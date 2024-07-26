@@ -1,28 +1,33 @@
 from django.contrib import admin
-from .models import Question, UserResult
+from .models import Question, UserResult, Category
 from django.contrib.auth.models import Group
 
 
 class ResultAdmin(admin.ModelAdmin):
     readonly_fields = (
-        'fullname',
-        'totall',
+        'username',
+        'total',
         'score',
         'percent',
-        'correct',
+        'current',
         'wrong',
-        'created_at',
+        'last_update',
     )
-    list_display = ('fullname', 'percent', 'score', 'totall')
+    list_display = ('username', 'percent', 'score', 'total')
     list_filter = ('percent',)
     search_fields = ('fullname',)
 
 
 class QuestionAdmin(admin.ModelAdmin):
-    list_display = ('question', 'answer', 'status')
-    list_filter = ('status',)
+    list_display = ('question', 'answer', 'status', 'category')
+    list_filter = ('status', 'category')
+
+
+class CategoryAdmin(admin.ModelAdmin):
+    list_display = ('category_name',)
 
 
 admin.site.register(Question, QuestionAdmin)
 admin.site.register(UserResult, ResultAdmin)
+admin.site.register(Category, CategoryAdmin)
 admin.site.unregister(Group)

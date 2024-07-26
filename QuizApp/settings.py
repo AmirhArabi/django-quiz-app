@@ -11,7 +11,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
-
 # Application definition
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -22,9 +21,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'graphene_django',
     'rest_framework',
+    'django_filters',
     'rest_framework.authtoken',
     'drf_spectacular',
-    # My apps
     'account_app.apps.AccountAppConfig',
     'quiz_app.apps.QuizAppConfig',
 ]
@@ -33,7 +32,6 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -83,20 +81,16 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
-LANGUAGE_CODE = 'fa-ir'
+LANGUAGE_CODE = 'en'
 TIME_ZONE = 'Asia/Tehran'
 USE_I18N = True
 USE_TZ = True
-
 
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'assets')]
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
-
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
 
 # Email Configs
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
@@ -106,18 +100,21 @@ EMAIL_PORT = 587
 EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
 if not EMAIL_HOST_USER:
-    EMAIL_HOST_USER = 'default_email@example.com'
+    EMAIL_HOST_USER = 'digitallyboy@gmail.com'
 if not EMAIL_HOST_PASSWORD:
-    EMAIL_HOST_PASSWORD = 'default_password'
+    EMAIL_HOST_PASSWORD = 'chxl swgm zqke ujkm'
 
 # Rest framework configs
 REST_FRAMEWORK = {
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
+    'DEFAULT_PARSER_CLASSES': [
+        'rest_framework.parsers.JSONParser'
+    ],
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
     ],
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
-
 
 # Swagger configs
 SPECTACULAR_SETTINGS = {
@@ -126,7 +123,6 @@ SPECTACULAR_SETTINGS = {
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
 }
-
 
 # GraphQL API configs
 GRAPHENE = {
@@ -137,6 +133,10 @@ GRAPHENE = {
     ],
 }
 
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 AUTHENTICATION_BACKENDS = [
     "graphql_jwt.backends.JSONWebTokenBackend",

@@ -1,14 +1,24 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.views.generic import View
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from quiz_app.permissions import IsStaff
 from .forms import LoginForm, RegisterForm
-from .serializers import UserSerializer
+from rest_framework.authtoken.models import Token
+from rest_framework import generics
+from rest_framework.exceptions import MethodNotAllowed
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
+from .serializers import UserSerializer, RegisterSerializer, AuthTokenSerializer
+
+
+class Logout(View):
+    def get(self, request):
+        logout(request)
+        return redirect('account:login_page')
 
 
 class Login(View):
@@ -73,3 +83,32 @@ class UserAddView(APIView):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
+class ObtainAuthToken(APIView):
+    serializer_class = AuthTokenSerializer
+    parser_classes = (MultiPartParser, FormParser, JSONParser)
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data['user']
+        token, created = Token.objects.get_or_create(user=user)
+        return Response({
+            'token': token.key,
+            'username': user.username,
+            'first_name': user.first_name,
+            'last_name': user.last_name,
+            'email': user.email,
+            'profile_image': 'https://uploadkon.ir/uploads/ddb016_24pi.jpg'
+
+        })
+
+
+class RegisterView(generics.CreateAPIView):
+    queryset = User.objects.all()
+    permission_classes = [AllowAny]
+    serializer_class = RegisterSerializer
+    parser_classes = (MultiPartParser, FormParser, JSONParser)
+
+    def get(self, request, *args, **kwargs):
+        raise MethodNotAllowed('GET')

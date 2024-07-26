@@ -1,5 +1,5 @@
-from rest_framework import serializers
-from .models import Question, UserResult
+from rest_framework import serializers, filters
+from .models import Question, UserResult, Category
 
 
 class QuestionsSerializer(serializers.ModelSerializer):
@@ -7,6 +7,18 @@ class QuestionsSerializer(serializers.ModelSerializer):
         model = Question
         exclude = ('status',)
         read_only_fields = ('id',)
+
+
+class CategorysSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = ('category_name', 'id')
+
+
+class QuestionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Question
+        fields = '__all__'
 
 
 class ResultSerializer(serializers.ModelSerializer):
